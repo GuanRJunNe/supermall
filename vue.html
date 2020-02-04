@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<div id='app'>
+  {{message}}
+  {{message}}
+  {{message}}
+  <!-- 1.app.message被修改  Vue是如何监听message数据发生的改变  Object.defineProperty-->
+  <!-- 2.当数据发生改变的时候，vue如何知道该通知谁 界面发生刷新  发布订阅者模式 -->
+  <!-- 数据发生改变了该告诉谁 是根据html代码进行分析 -->
+</div>
+  <script src='./node_modules/vue/dist/vue.js'></script>
+  <!-- <script>
+    const app = new Vue({
+      el:'#app',
+      data(){
+        return {
+          message:'关'
+        }
+      }
+    })
+  </script> -->
+<script>
+  const obj = {
+    message:'关',
+    name:'kk'
+  }
+  Object.keys(obj).forEach(key =>{
+    const value = obj[key];
+    Object.defineProperty(obj,key,{
+      set(newValue){
+        console.log('修改了值')
+        value = newValue
+      },
+      get(){
+        console.log('得到了值')
+        return value
+      }
+    })
+  })
+  // 发布者
+  class Dep{
+    constructor(){
+      this.subs=[];
+    }
+    addsub(s){
+      this.subs.push(s)
+    }
+    defi(){
+      this.subs.forEach(item => {
+        item.update()
+      })
+    }
+  }
+
+  // 订阅者
+  class Watcher{
+    constructor(wname){
+      this.name = wname
+    }
+    update(){
+      console.log(this.name+'修改了');
+    }
+
+
+  }
+let dep = new Dep();
+let w1 = new Watcher('hhh');
+// 添加订阅者
+dep.addsub(w1);
+let w2 = new Watcher('ggg');
+// 添加订阅者
+dep.addsub(w2);
+let w3 = new Watcher('fff');
+// 添加订阅者
+dep.addsub(w3);
+
+dep.defi();
+</script>
+
+</body>
+</html>
